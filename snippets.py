@@ -27,13 +27,11 @@ def put(name, snippet):
 def get(name):
     """Retrieve the snippet with a given name"""
     logging.info("Get function used to get values of {!r}".format(name))
-    cursor = connection.cursor()
-    command = "select keyword, message from snippets where keyword='%s'" %(name)
-    cursor.execute(command)
-    result = cursor.fetchone()
+    with connection, connection.cursor() as cursor:
+      cursor.execute("select message from snippets where keyword=%s", (name,))
+      row = cursor.fetchone()
     logging.debug("Snippet retrived successfully.")
-    connection.commit()
-    return result
+    return row
 
 
 
