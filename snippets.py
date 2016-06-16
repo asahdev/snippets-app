@@ -1,3 +1,4 @@
+import sys
 import psycopg2
 import logging
 import argparse
@@ -33,7 +34,21 @@ def get(name):
     logging.debug("Snippet retrived successfully.")
     return row
 
+def catalog():
+   """Retrive all the keywords"""
+   with connection, connection.cursor() as cursor:
+      cursor.execute("select keyword from snippets;")
+      row = cursor.fetchall()
+   logging.debug("all keywords displayed")
+   return row
 
+
+#   logging.info("Funcation to get value of all keywords")
+#   cursor = connection.cursor()
+#   command = "select * from snippets;"
+#   a = cursor.execute(command)
+#   connection.commit()
+#   print(a)
 
 def main():
     """Main function"""
@@ -52,12 +67,28 @@ def main():
     get_parser = subparsers.add_parser("get", help="Store a snippet")
     get_parser.add_argument("name", help="Name of the snippet")
 
+    #Subparser for the all command
+    logging.debug("Constructing all subparser")
+    all_parser = subparsers.add_parser("all", help="show all keywords")
+#    all_parser.add_argument("all", help="Get values of all text")
+
+
+#    print(len(sys.argv))
+#    if len(sys.argv) <= 1:
+#      print("No argument provided")
+    
+
     arguments = parser.parse_args()
     arguments = vars(arguments)
     command = arguments.pop("command")
-    if command == "put":
+    if command == None:
+      print("No arguments entered")
+    elif command == "put":
       name, snippet = put(**arguments)
       print("Stored {!r} as {!r}".format(snippet, name))
+    elif command == "all":
+      keywords = catalog()
+      print("All Keyword are ",(keywords))
     elif command == "get":
       snippet = get(**arguments)
       if snippet == None:
